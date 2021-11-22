@@ -25,9 +25,11 @@ class CarController extends Controller
         */
         //$cars = Car::all();
         //Car::orderBy('created_at', 'desc')->get();
-        $cars = Car::latest()->get();
+        //dd(request()->all());
+        $cars = Car::latest()->paginate(6);
         //자료들을 시간 순으로 가져옴
-        return view('cars.index',['cars'=>$cars]);
+        // dd($cars);
+        return view('components.cars.index',['cars'=>$cars]);
 
     }
 
