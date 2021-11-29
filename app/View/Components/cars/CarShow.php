@@ -1,21 +1,19 @@
 <?php
 
-namespace App\View\Components\cars;
+namespace App\View\Components\Cars;
 
 use Illuminate\View\Component;
 
-class RegisterCar extends Component
+class CarShow extends Component
 {
-
-    public $compaines;
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($companies)
+    public function __construct()
     {
-        $this->companies = $companies;
+        //
     }
 
     /**
@@ -25,6 +23,6 @@ class RegisterCar extends Component
      */
     public function render()
     {
-        return view('components.cars.register-car');
+        return view('components.cars.car-show');
     }
 }

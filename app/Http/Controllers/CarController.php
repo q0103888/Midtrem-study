@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CarController extends Controller
 {
@@ -26,7 +28,7 @@ class CarController extends Controller
         //$cars = Car::all();
         //Car::orderBy('created_at', 'desc')->get();
         //dd(request()->all());
-        $cars = Car::latest()->paginate(6);
+        $cars = Car::latest()->paginate(5);
         //자료들을 시간 순으로 가져옴
         // dd($cars);
         return view('components.cars.index',['cars'=>$cars]);
@@ -40,7 +42,9 @@ class CarController extends Controller
      */
     public function create()
     {
-        //
+        $companies = Company::all();
+        return view('components.cars.register-car', 
+                ['companies'=>$companies]);
     }
 
     /**
@@ -51,7 +55,41 @@ class CarController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $now = now();     
+        // 1. 자동차 정보 저장에 필요한 데이터가 모두 적절한
+        //    형태로 왔는지 정당성 검사를 수행하자.
+        $data = $request->validate([
+                        'image'=>'required|image',
+                        'name'=>'required',
+                        'company_id'=>'required',
+                        'year'=>'required|numeric|min:1800|max:'.($now->year+1),
+                        'price'=>'required|numeric|min:1',
+                        'type'=>'required',
+                        'style'=>'required'
+                        ]);
+                        //dd($data);
+        // 2. 이미지를 파일 시스템의 특정 위치에 저장한다.
+        // $fileName = null;
+        // if($request->hasFile('image')) {
+        // $fileName = time().'_'.
+        // $request->file('image')->getClientOriginalName();
+        // $path = $request->file('image')  
+        //     ->storeAs('public/images', $fileName);
+        // }                       
+        // $input = array_merge($request->all(), 
+        //     ["user_id"=>Auth::user()->id]);
+        // if($fileName) {
+        // $input = array_merge($input, ['image' => $fileName]);
+        // }
+
+        //2-1 수업내용
+        $path = $request->image->store('images','public');
+        $data = array_merge($data, ['image'=>$path]);
+
+        // 3. 요청정보($request)에서 필요한 데이터를 꺼내가지고 DB에 저장한다
+        Car::create($data);
+        // 4. cars.index로 redirection  
+        return redirect()->route('cars.index');
     }
 
     /**
@@ -60,9 +98,10 @@ class CarController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Car $car)
     {
-        //
+        // 상세보기 페이지
+        return view('components.cars.car-show', compact('car'));
     }
 
     /**
