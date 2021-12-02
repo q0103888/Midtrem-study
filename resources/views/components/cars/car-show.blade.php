@@ -4,7 +4,7 @@
     <div class="w-full max-w-xs mx-auto my-6">
             <div class="my-2">
                 <label for="image">자동차 이미지: </label>
-                <img src="{{ '/storage/'. $car->image }}">
+                <img src="{{ $car->image }}">
             </div>
             <div class="my-2">
                 <label for="company">제조회사: </label>
@@ -50,7 +50,12 @@
                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="style">
             </div> 
-            <button class="my-4 px-4 py-2 bg-blue-400 rounded shadow text-white">등록</button>
+            <button class="my-4 px-4 py-2 bg-blue-400 rounded shadow text-white">
+                <a href="{{ route('cars.index') }}">목록보기</button>
+            <button class="my-4 px-4 py-2 bg-green-400 rounded shadow text-white">
+                <a href="{{ route('cars.edit',['car'=>$car->id]) }}">수정</button>
+            <button class="my-4 px-4 py-2 bg-red-400 rounded shadow text-white">
+                <a href="{{ route('cars.destroy',['car'=>$car->id]) }}">삭제</button>
     
     </div>
 </div>

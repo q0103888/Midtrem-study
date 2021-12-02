@@ -17,6 +17,7 @@ class Car extends Model
     }
 
     public function getImageAttribute($value) {
-        return '/storage'
+        return '/storage/'.$value;
+        // return해주면 Accessor에 접근하여 
     }
 }

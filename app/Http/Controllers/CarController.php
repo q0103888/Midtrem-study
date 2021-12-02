@@ -6,6 +6,7 @@ use App\Models\Car;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class CarController extends Controller
 {
@@ -110,9 +111,11 @@ class CarController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Car $car, Company $companies)
     {
-        //
+        $companies = Company::all();
+        return view('components.cars.car-edit',
+           compact(['car','companies'])); // ['car'=>$car]
     }
 
     /**
@@ -122,9 +125,43 @@ class CarController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Car $car)
     {
-        //
+        $now = now();     
+        dd($request->image);
+        // 1. 자동차 정보 저장에 필요한 데이터가 모두 적절한
+        //    형태로 왔는지 정당성 검사를 수행하자.
+        $data = $request->validate([
+                        'image'=>'image',
+                        'name'=>'required',
+                        'company_id'=>'required',
+                        'year'=>'required|numeric|min:1800|max:'.($now->year+1),
+                        'price'=>'required|numeric|min:1',
+                        'type'=>'required',
+                        'style'=>'required'
+                        ]);
+                        // dd('original:'. $car->image);
+
+        $path = null;
+        if($request->image) { //기존 이미지를 변경하고자 하는 경우 
+            Storage::delete($car->image);
+            $path = $request->image->store('images','public');
+        }
+
+        if($path != null) {
+             $data = array_merge($data, ['image'=>$path]);
+        }
+        // 3. 요청정보($request)에서 필요한 데이터를 꺼내가지고 DB에 저장한다
+
+        //update set image=?, name=?, style=?, kind=?
+        $car->update($data);
+
+        // 4. cars.index로 redirection  
+
+        // network tab에서 compact('car')를  이용했을 때
+        // 서버에서 어떤 지시가 오는지 확인해보자
+        return redirect()->route('cars.show', 
+                ['car'=>$car->id]);
     }
 
     /**
